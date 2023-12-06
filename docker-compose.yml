@@ -1,0 +1,29 @@
+version: "2"
+
+volumes:
+  recorder-storage:
+
+services:
+  stream:
+    image: rabbitmq:3
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 30s
+      retries: 3
+
+  recorder:
+    depends_on:
+      stream:
+        condition: service_healthy
+    build: ./recorder
+    environment:
+      AUREC_RABBITMQ_IP: stream
+      AUREC_RABBITMQ_VIDEO_BLOB_QUEUE: "blob"
+      AUREC_RABBITMQ_NOTIFICATION_QUEUE: "notifications"
+      # must match volume path, otherwise the app will store videos in /tmp
+      AUREC_VIDEO_LOCATION: "/var/lib/aurec-recorder/videos"
+    devices:
+      - /dev/video0:/dev/video0
+    volumes:
+      - recorder-storage:/var/lib/aurec-recorder/videos
