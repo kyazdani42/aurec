@@ -19,7 +19,7 @@ services:
     build: ./recorder
     environment:
       AUREC_RABBITMQ_IP: stream
-      AUREC_RABBITMQ_VIDEO_BLOB_QUEUE: "blob"
+      AUREC_RABBITMQ_VIDEO_BLOB_QUEUE: "blob-stream"
       AUREC_RABBITMQ_NOTIFICATION_QUEUE: "notifications"
       # must match volume path, otherwise the app will store videos in /tmp
       AUREC_VIDEO_LOCATION: "/var/lib/aurec-recorder/videos"

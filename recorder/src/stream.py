@@ -13,7 +13,7 @@ class Stream():
     def __init__(self):
         self.conn = pika.BlockingConnection(pika.ConnectionParameters(HOST))
         self.channel = self.conn.channel()
-        self.channel.queue_declare(queue=BLOB_QUEUE)
+        self.channel.queue_declare(queue=BLOB_QUEUE, auto_delete=True)
         self.channel.queue_purge(queue=BLOB_QUEUE)
         self.channel.queue_declare(queue=NOTIFICATION_QUEUE)
 
