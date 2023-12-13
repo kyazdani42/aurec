@@ -34,3 +34,18 @@ services:
         - path: ./recorder
           action: rebuild
           ignore: [venv/, __pycache__/]
+
+  streamer:
+    build: ./streamer
+    depends_on:
+      recorder:
+        condition: service_started
+    environment:
+      AUREC_STREAM_SOCKET: "/run/aurec-recorder/stream/socket"
+    volumes:
+      - stream-socket:/run/aurec-recorder/stream
+    develop:
+      watch:
+        - path: ./streamer
+          action: rebuild
+          ignore: [target/]
