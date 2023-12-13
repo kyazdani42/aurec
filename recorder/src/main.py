@@ -11,8 +11,8 @@ from recorder import Recorder
 from compare_frames import compare_frames
 
 def start_recording(stream: Stream, recorder: Recorder, frame: Frame):
-    on_start = lambda fname: stream.send("rec_start", fname)
-    on_end = lambda fname: stream.send("rec_end", fname)
+    on_start = lambda fname: stream.send_message("rec_start", fname)
+    on_end = lambda fname: stream.send_message("rec_end", fname)
     recorder.start(frame, on_start, on_end)
 
 def execute(stream: Stream, recorder: Recorder, current_frame: Frame, previous_frame: Frame):

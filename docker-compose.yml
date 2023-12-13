@@ -2,9 +2,10 @@ version: "2"
 
 volumes:
   recorder-storage:
+  stream-socket:
 
 services:
-  stream:
+  queue:
     image: rabbitmq:3
     healthcheck:
       test: rabbitmq-diagnostics -q ping
@@ -13,17 +14,23 @@ services:
       retries: 3
 
   recorder:
-    depends_on:
-      stream:
-        condition: service_healthy
     build: ./recorder
+    depends_on:
+      queue:
+        condition: service_healthy
     environment:
-      AUREC_RABBITMQ_IP: stream
-      AUREC_RABBITMQ_VIDEO_BLOB_QUEUE: "blob-stream"
+      AUREC_RABBITMQ_IP: queue
       AUREC_RABBITMQ_NOTIFICATION_QUEUE: "notifications"
       # must match volume path, otherwise the app will store videos in /tmp
       AUREC_VIDEO_LOCATION: "/var/lib/aurec-recorder/videos"
+      AUREC_STREAM_SOCKET: "/run/aurec-recorder/stream/socket"
     devices:
       - /dev/video0:/dev/video0
     volumes:
       - recorder-storage:/var/lib/aurec-recorder/videos
+      - stream-socket:/run/aurec-recorder/stream
+    develop:
+      watch:
+        - path: ./recorder
+          action: rebuild
+          ignore: [venv/, __pycache__/]
