@@ -39,11 +39,6 @@ services:
     volumes:
       - recorder-storage:/var/lib/aurec-recorder/videos
       - stream-socket:/run/aurec-recorder/stream
-    develop:
-      watch:
-        - path: ./recorder
-          action: rebuild
-          ignore: [venv/, __pycache__/]
 
   streamer:
     build: ./streamer
@@ -55,11 +50,6 @@ services:
       AUREC_STREAM_SOCKET: "/run/aurec-recorder/stream/socket"
     volumes:
       - stream-socket:/run/aurec-recorder/stream
-    develop:
-      watch:
-        - path: ./streamer
-          action: rebuild
-          ignore: [target/]
 
   video-api:
     build: ./video-api
@@ -71,11 +61,6 @@ services:
       AUREC_VIDEO_LOCATION: "/var/lib/aurec-recorder/videos"
     volumes:
       - recorder-storage:/var/lib/aurec-recorder/videos
-    develop:
-      watch:
-        - path: ./video-api
-          action: rebuild
-          ignore: [target/]
 
   gateway:
     build: ./gateway
@@ -83,7 +68,3 @@ services:
     depends_on: [streamer]
     ports:
       - 80:8080
-    develop:
-      watch:
-        - path: ./gateway
-          action: rebuild
