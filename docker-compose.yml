@@ -1,5 +1,13 @@
 version: "2"
 
+networks:
+  infra:
+    driver: bridge
+    internal: true
+  service:
+    driver: bridge
+    internal: true
+
 volumes:
   recorder-storage:
   stream-socket:
@@ -7,6 +15,7 @@ volumes:
 services:
   queue:
     image: rabbitmq:3
+    networks: [infra]
     healthcheck:
       test: rabbitmq-diagnostics -q ping
       interval: 10s
@@ -15,6 +24,7 @@ services:
 
   recorder:
     build: ./recorder
+    networks: [infra]
     depends_on:
       queue:
         condition: service_healthy
@@ -37,6 +47,7 @@ services:
 
   streamer:
     build: ./streamer
+    networks: [service]
     depends_on:
       recorder:
         condition: service_started
@@ -52,6 +63,7 @@ services:
 
   video-api:
     build: ./video-api
+    networks: [service]
     depends_on:
       recorder:
         condition: service_started
