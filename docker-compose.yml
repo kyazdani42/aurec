@@ -49,3 +49,18 @@ services:
         - path: ./streamer
           action: rebuild
           ignore: [target/]
+
+  video-api:
+    build: ./video-api
+    depends_on:
+      recorder:
+        condition: service_started
+    environment:
+      AUREC_VIDEO_LOCATION: "/var/lib/aurec-recorder/videos"
+    volumes:
+      - recorder-storage:/var/lib/aurec-recorder/videos
+    develop:
+      watch:
+        - path: ./video-api
+          action: rebuild
+          ignore: [target/]
