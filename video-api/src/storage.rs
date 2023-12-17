@@ -20,8 +20,7 @@ impl Storage {
     pub fn list_videos(&self) -> Result<Vec<Video>, String> {
         Ok(read_dir(&self.video_location)
             .map_err(|e| format!("Opening folder at location {}: {}", self.video_location, e))?
-            .map(Video::from_readdir)
-            .flatten()
+            .flat_map(Video::from_readdir)
             .collect())
     }
 
