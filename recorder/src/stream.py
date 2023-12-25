@@ -1,5 +1,5 @@
 from typing import Any
-from video import Frame
+from video import Frame, to_binary
 
 from os import environ as env
 
@@ -21,7 +21,7 @@ class Stream():
 
     def send_frame(self, frame: Frame):
         with open(SOCKET_LOCATION, "wb") as f:
-            f.write(frame)
+            f.write(to_binary(frame))
             f.close()
 
     def send_message(self, kind: str, data: Any):

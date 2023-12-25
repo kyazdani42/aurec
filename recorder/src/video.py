@@ -24,4 +24,4 @@ def get_camera():
     return cv2.VideoCapture(0)
 
 def to_binary(frame: Frame) -> bytes:
-    return frame.tobytes()
+    return cv2.imencode('.jpg', frame)[1].tobytes()
