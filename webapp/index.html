@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Aurec</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="640" height="480"></canvas>
+  </body>
+  <script>
+  const VIDEO_LIST_API_ENDPOINT = "/api/videos";
+  const VIDEO_READ_API_ENDPOINT = id => `${VIDEO_LIST_API_ENDPOINT}/${f}`;
+  const VIDEO_STREAM_API_ENDPOINT = "/api/stream";
+  const canvasEl = document.querySelector('#canvas')
+  const canvasCtx = canvasEl.getContext('2d');
+
+  const img = new Image();
+  img.onload = ev => {
+    canvasCtx.drawImage(ev.target, 0, 0, 640, 480)
+  };
+
+  const getJpegEndIdx = chunk => {
+    for (let i = 0; i < chunk.length; i++) {
+      if (chunk[i] === 0xff && chunk[i + 1] === 0xd9) {
+        return i + 1;
+      }
+    }
+  }
+
+  const merge = (chunkLeft, chunkRight) => {
+    const merged = new Uint8Array(chunkLeft.length + chunkRight.length);
+    merged.set(chunkLeft);
+    merged.set(chunkRight, chunkLeft.length);
+    return merged;
+  };
+
+  const fetchStream = async () => {
+    const response = await fetch(`http://localhost/${VIDEO_STREAM_API_ENDPOINT}`);
+
+    let processing = new Uint8Array();
+
+    for await (const chunk of response.body) {
+      processing = merge(processing, chunk);
+
+      if (!shouldStop) {
+        const imageEndIdx = getJpegEndIdx(processing);
+        if (imageEndIdx) {
+          const b = new Blob([processing.slice(0, imageEndIdx + 1)], { type: 'image/jpg' });
+          img.src = URL.createObjectURL(b);
+          processing = processing.slice(imageEndIdx + 1);
+        }
+      }
+    }
+  };
+
+  let shouldStop = false;
+
+  async function start() {
+    shouldStop = false;
+    await fetchStream();
+    if (!shouldStop) {
+      await start();
+    }
+  }
+
+  function stop() {
+    shouldStop = true;
+    canvasCtx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+  }
+
+  </script>
+</html>
