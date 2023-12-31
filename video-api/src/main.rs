@@ -1,5 +1,4 @@
-use actix_web::{get, web, App, Error, HttpResponse, HttpServer};
-use futures::{future::ok, stream::once};
+use actix_web::{get, web, App, HttpResponse, HttpServer};
 
 mod logger;
 mod storage;
@@ -28,8 +27,8 @@ async fn serve_video(path: web::Path<String>, ctx: web::Data<Ctx>) -> HttpRespon
     let selected_video_name = path.into_inner();
     match ctx.storage.get_video(selected_video_name) {
         Ok(video_bytes) => HttpResponse::Ok()
-            .content_type("application/octet-stream")
-            .streaming(once(ok::<_, Error>(web::Bytes::from_iter(video_bytes)))),
+            .content_type("video/mp4")
+            .body(video_bytes),
         Err(e) => {
             ctx.logger.log_err(e);
             HttpResponse::InternalServerError().into()
