@@ -16,4 +16,4 @@ COPY --from=build /usr/local/cargo/bin/video-api /usr/bin/video-api
 
 EXPOSE 8080
 
-CMD video-api
+ENTRYPOINT ["video-api"]

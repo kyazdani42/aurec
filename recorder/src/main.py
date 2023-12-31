@@ -1,4 +1,5 @@
 from time import sleep
+import signal
 
 from video import Frame
 
@@ -44,6 +45,7 @@ def run(camera: Camera, stream: Stream, recorder: Recorder):
         previous_frame = current_frame
 
 def main():
+    signal.signal(signal.SIGINT, lambda _, __: exit(0))
     run(Camera(), Stream(), Recorder(Timer(), Writer()))
 
 if __name__ == '__main__':

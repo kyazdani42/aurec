@@ -28,6 +28,7 @@ services:
     depends_on:
       queue:
         condition: service_healthy
+    stop_signal: SIGINT
     environment:
       AUREC_RABBITMQ_IP: queue
       AUREC_RABBITMQ_NOTIFICATION_QUEUE: "notifications"

@@ -16,4 +16,4 @@ COPY --from=build /usr/local/cargo/bin/streamer /usr/bin/streamer
 
 EXPOSE 8080
 
-CMD streamer
+ENTRYPOINT ["streamer"]
