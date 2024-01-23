@@ -1,9 +1,9 @@
-use actix_web::{get, App, HttpResponse, HttpServer, Responder};
+use actix_web::{get, App, HttpResponse, HttpServer};
 
 mod streamer;
 
 #[get("/stream")]
-async fn stream() -> impl Responder {
+async fn stream() -> HttpResponse {
     match streamer::Streamer::new() {
         Ok(streamer) => HttpResponse::Ok()
             .content_type("application/octet-stream")
