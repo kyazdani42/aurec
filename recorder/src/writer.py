@@ -1,30 +1,18 @@
-import cv2
-from os import environ as env
-
-from video import Frame
-
-STORAGE_FOLDER = env.get("AUREC_VIDEO_LOCATION") or "/tmp"
-CODEC = cv2.VideoWriter.fourcc(*'mp4v')
+from video import Frame, VideoWriter
 
 class Writer():
     def __init__(self):
-        self.writers = {}
+        self.writer = None
 
     def init(self, filename: str, frame: Frame):
-        self.writers[filename] = cv2.VideoWriter()
-        self._filename = STORAGE_FOLDER + "/" + filename + ".mp4"
+        self.writer = VideoWriter()
         h, w = frame.shape[:2]
-        self.writers[filename].open(self._filename, CODEC, 14.5, (w, h), True)
+        self.writer.open(filename, 14.5, (w, h))
 
-    def release(self, filename: str):
-        self.writers[filename].release()
-        self.writers.pop(filename)
+    def release(self):
+        self.writer = None
 
     def write(self, filename: str, frame: Frame):
-        if not self.writers.get(filename):
+        if self.writer is None:
             self.init(filename, frame)
-
-        if not self.writers[filename].isOpened():
-            raise Exception("Failed to write to file " + self._filename)
-        else:
-            self.writers[filename].write(frame)
+        self.writer.write(frame) # type:ignore

@@ -25,6 +25,9 @@ class Stream():
             f.close()
 
     def send_message(self, kind: str, data: Any):
-        if self.conn is not None:
-            body = kind + " | " + data
-            self.channel.basic_publish(exchange='amq.direct', routing_key=NOTIFICATION_QUEUE, body=body)
+            if self.conn is not None:
+                body = kind + " | " + data
+                try:
+                    self.channel.basic_publish(exchange='amq.direct', routing_key=NOTIFICATION_QUEUE, body=body)
+                except:
+                    self.__init__()

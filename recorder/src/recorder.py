@@ -49,5 +49,5 @@ class Recorder():
             self._record_started_at = time
         elif time - self._record_started_at > 29: # type: ignore
             self._on_end(self._filename) # type: ignore
-            self.Writer.release(self._filename) # type: ignore
+            self.Writer.release()
             self._reset_state()

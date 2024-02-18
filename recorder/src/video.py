@@ -1,3 +1,5 @@
+import os
+
 import cv2
 from cv2.typing import MatLike
 
@@ -25,3 +27,24 @@ def get_camera():
 
 def to_binary(frame: Frame) -> bytes:
     return cv2.imencode('.jpg', frame)[1].tobytes()
+
+_STORAGE_FOLDER = os.environ.get("AUREC_VIDEO_LOCATION") or "/tmp"
+_CODEC = cv2.VideoWriter.fourcc(*'avc1')
+_EXT = ".mp4"
+
+class VideoWriter():
+    def __init__(self):
+        self.writer = cv2.VideoWriter()
+
+    def __del__(self):
+        self.writer.release()
+
+    def open(self, filename: str, fps: float, wh: tuple[int, int]):
+        self._filename = _STORAGE_FOLDER + "/" + filename + _EXT
+        self.writer.open(self._filename, _CODEC, fps, wh)
+
+    def write(self, frame: Frame):
+        if self.writer.isOpened():
+            self.writer.write(frame)
+        else:
+            raise Exception("Failed to write to file " + self._filename)
